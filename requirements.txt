@@ -1,0 +1,3 @@
+pygame
+launchpad_py
+oscpy
