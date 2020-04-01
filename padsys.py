@@ -17,7 +17,7 @@
 from launch import Launchpad_wrapper
 from osc import OSC_send, OSC_receive
 
-NUMBER_OF_PADS = 1
+NUMBER_OF_PADS = 2
 
 OSC_s = OSC_send()
 l = []

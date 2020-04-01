@@ -22,33 +22,33 @@ class Launchpad_wrapper:
         self.lp = launchpad.Launchpad();
 
         # check for available launchpads
-        if self.lp.Check( 0, "pro" ):
+        if self.lp.Check( padnum, "pro" ):
             self.lp = launchpad.LaunchpadPro()
-            if self.lp.Open(0,"pro"):
+            if self.lp.Open(padnum,"pro"):
                 print("Launchpad Pro Detected")
                 self.mode = "pro"
                 
-        elif self.lp.Check( 0, "mk2" ):
+        elif self.lp.Check( padnum, "mk2" ):
             self.lp = launchpad.LaunchpadMk2()
-            if self.lp.Open( 0, "mk2" ):
+            if self.lp.Open( padnum, "mk2" ):
                 print("Launchpad Mk2 Detected")
                 self.mode = "mk2"
 
-        elif self.lp.Check( 0, "control xl" ):
+        elif self.lp.Check( padnum, "control xl" ):
             self.lp = launchpad.LaunchControlXL()
-            if self.lp.Open( 0, "control xl" ):
+            if self.lp.Open( padnum, "control xl" ):
                 print("Launch Control XL Detected, but not supported.")
                 exit()
                 
-        elif self.lp.Check( 0, "launchkey" ):
+        elif self.lp.Check( padnum, "launchkey" ):
             self.lp = launchpad.LaunchKeyMini()
-            if self.lp.Open( 0, "launchkey" ):
+            if self.lp.Open( padnum, "launchkey" ):
                 print("LaunchKey (Mini) Detected, but not supported.")
                 exit()
 
-        elif self.lp.Check( 0, "dicer" ):
+        elif self.lp.Check( padnum, "dicer" ):
             self.lp = launchpad.Dicer()
-            if self.lp.Open( 0, "dicer" ):
+            if self.lp.Open( padnum, "dicer" ):
                 print("Dicer Detected, but not supported.")
                 exit()			
         else:
@@ -71,14 +71,14 @@ class Launchpad_wrapper:
         self.lp.Reset()
 
     def savecolours(self):
-        with open("save.json", "w") as f:
+        with open("save"+str(self.padnum)+".json", "w") as f:
             f.write(json.dumps(self.buttons))
             print("Save Successful")
 
 
     def loadcolours(self):
         try:
-            with open("save.json", "r") as f:
+            with open("save"+str(self.padnum)+".json", "r") as f:
                 self.buttons = json.loads(''.join(f.readlines()))
                 print("Load Successful")
         except:
