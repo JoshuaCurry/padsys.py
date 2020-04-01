@@ -1,6 +1,7 @@
 import json
 import launchpad_py as launchpad
 import time
+import logging
 
 
 colours = {"off":[0,False], "red":[5,False], "orange":[9,False], "yellow":[13,False], "green":[21,False], "cyan":[37,False], "blue":[45,False], "magenta":[53,False], "uv":[49,False], "white":[3,False], "flash_red":[5,True], "flash_orange":[9,True], "flash_yellow":[13,True], "flash_green":[21,True], "flash_cyan":[37,True], "flash_blue":[45,True], "flash_magenta":[53,True], "flash_uv":[49,True], "flash_white":[3,True], "light_red":[4,False], "light_orange":[8,False], "light_yellow":[12,False], "light_green":[20,False], "light_cyan":[36,False], "light_blue":[44,False], "light_magenta":[52,False], "light_uv":[48,False], "light_white":[1,False]}
@@ -25,39 +26,40 @@ class Launchpad_wrapper:
         if self.lp.Check( padnum, "pro" ):
             self.lp = launchpad.LaunchpadPro()
             if self.lp.Open(padnum,"pro"):
-                print("Launchpad Pro Detected")
+                logging.critical("Launchpad Pro Detected, but not supported")
                 self.mode = "pro"
+                exit()
                 
         elif self.lp.Check( padnum, "mk2" ):
             self.lp = launchpad.LaunchpadMk2()
             if self.lp.Open( padnum, "mk2" ):
-                print("Launchpad Mk2 Detected")
+                logging.info("Launchpad id:{} Mk2 Detected".format(padnum))
                 self.mode = "mk2"
 
         elif self.lp.Check( padnum, "control xl" ):
             self.lp = launchpad.LaunchControlXL()
             if self.lp.Open( padnum, "control xl" ):
-                print("Launch Control XL Detected, but not supported.")
+                logging.critical("Launch Control XL Detected, but not supported.")
                 exit()
                 
         elif self.lp.Check( padnum, "launchkey" ):
             self.lp = launchpad.LaunchKeyMini()
             if self.lp.Open( padnum, "launchkey" ):
-                print("LaunchKey (Mini) Detected, but not supported.")
+                logging.critical("LaunchKey (Mini) Detected, but not supported.")
                 exit()
 
         elif self.lp.Check( padnum, "dicer" ):
             self.lp = launchpad.Dicer()
             if self.lp.Open( padnum, "dicer" ):
-                print("Dicer Detected, but not supported.")
+                logging.critical("Dicer Detected, but not supported.")
                 exit()			
         else:
             if self.lp.Open():
-                print("Launchpad Mk1/S/Mini Detected")
+                logging.info("Launchpad id:{} Mk1/S/Mini Detected".format(padnum))
                 self.mode = "mk1"
 
         if self.mode is None:
-            print("Did not find Launchpad, check USB connection...")
+            logging.critical("Did not find Launchpad id:{}, check USB connection...".format(padnum))
             exit()
 
         self.lp.Reset() # turn all LEDs off
@@ -73,16 +75,16 @@ class Launchpad_wrapper:
     def savecolours(self):
         with open("save"+str(self.padnum)+".json", "w") as f:
             f.write(json.dumps(self.buttons))
-            print("Save Successful")
+            logging.info("Save Successful")
 
 
     def loadcolours(self):
         try:
             with open("save"+str(self.padnum)+".json", "r") as f:
                 self.buttons = json.loads(''.join(f.readlines()))
-                print("Load Successful")
+                logging.info("Launchpad id:{} config load successful".format(self.padnum))
         except:
-            print("problem with save file... skipping...")
+            logging.info("Launchpad id:{} problem with save file... skipping...".format(self.padnum))
 
         for but in range(11,112):
             self.setCol(but, self.buttons[but])
@@ -92,7 +94,7 @@ class Launchpad_wrapper:
     def buttonRead(self):
         but = self.lp.ButtonStateRaw()
         if but != []:
-            print(" event: ", but )
+            # logging.debug(" event: {}".format(but) )
 
             if(but[1]==0):
                 event = False
@@ -119,6 +121,17 @@ class Launchpad_wrapper:
         else:
             c = colours[col][0]
             self.lp.LedCtrlRawByCode(num, c)
+
+    def feedback(self, but, value):
+        if(value==0):
+            if(self.buttons[but]!='off'):
+                logging.debug("Launchpad id:{}, deactivating {} ".format(self.padnum, but))
+                self.setCol(but, "light_"+self.buttons[but])
+        
+        if(value==1):
+            if(self.buttons[but]!='off'):
+                logging.debug("Launchpad id:{}, activating {} ".format(self.padnum, but))
+                self.setCol(but, self.buttons[but].replace('light_', ''))
         
 
     def normalmode(self):
@@ -129,14 +142,14 @@ class Launchpad_wrapper:
             self.OSC.transmitOSC(self.padnum, num)
             
             if(self.buttons[num]!='off'):
-                print("ACTIVATE "+str(num))
+                logging.debug("Launchpad id:{}, col set button press, brightening {}".format(self.padnum, num))
                 self.setCol(num, self.buttons[num].replace('light_', ''))
         elif(state==False):
             self.states[num] = False
         else:
             time.sleep(0.001)
             if(self.states[110] and self.states[111] and self.states[89] and self.states[19]):
-                print("ENTER CONFIGURATION MODE")
+                logging.info("Launchpad id:{} Entered configuration mode".format(self.padnum))
                 self.configmode()
                 self.setCol(110,'off')
                 self.setCol(111,'off')
@@ -148,7 +161,6 @@ class Launchpad_wrapper:
 
             if((time.time()-self.lastrequesttime)>1):
                 # refresh active
-                print('refresh')
                 self.OSC.send_message(b'/feedback/exec', b'1')
                 self.lastrequesttime = time.time()
 
