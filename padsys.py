@@ -14,12 +14,13 @@
 # Usage: padsys.py [no args]
 #
 
-from launch import Launchpad_wrapper
-from osc import OSC_send, OSC_receive
-import logging
-import colour_logs
+from padsys.launch import Launchpad_wrapper
+from padsys.osc import OSC_send, OSC_receive
+import padsys.colour_logs as colour_logs
 import sys
 import argparse
+import logging
+
 
 parser = argparse.ArgumentParser(description='PadSys.py: Use Novation Launchpads to control Chamsys MagicQ over OSC')
 parser.add_argument('-n', '--pads', required=False, default="1", type=int,
