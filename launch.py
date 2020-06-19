@@ -75,7 +75,7 @@ class Launchpad_wrapper:
     def savecolours(self):
         with open("save"+str(self.padnum)+".json", "w") as f:
             f.write(json.dumps(self.buttons))
-            logging.info("Save Successful")
+            logging.info("Save Successful to {}".format(str(self.padnum)+".json"))
 
 
     def loadcolours(self):
@@ -185,17 +185,17 @@ class Launchpad_wrapper:
                         col=settable[(settable.index(prevcol)+1)]
 
                     paintcol = col
-                    print("paint colour updated")
+                    logging.debug("Launchpad id:{} Paint colour updated to {}".format(self.padnum, col))
                     self.setCol(num,paintcol)
 
                 elif(num==111):
-                    print("EXIT BUTTON PRESS")
+                    logging.info("Launchpad id:{} Exited configuration mode".format(self.padnum))
                     self.OSC.send_message(b'/feedback/exec', b'1')
                     self.savecolours()
                     break
 
                 else:
-                    print("doing colour paint")
+                    logging.debug("Launchpad id:{} Painted {} {}".format(self.padnum, num, paintcol))
                     self.buttons[num] = paintcol
                     self.setCol(num,paintcol)
             else:
