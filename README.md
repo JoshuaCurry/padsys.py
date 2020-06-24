@@ -2,7 +2,8 @@
 Python-based implementation of Padsys by Electronics (https://github.com/electronics/padsys).
 
 Padsys allows you to control Chamsys MagicQ Exec Pages over OSC using Novation Launchpads.
-The current implementation was tested with two Launchpad MK2's (RGB), but theoretically even first generation launchpads should work.
+The current implementation was tested with two Launchpad MK2's (RGB), but theoretically even first generation launchpads, and launchpad mini's should work.
+Currently, Launchpad Pro's don't work because they have lots of extra buttons. This may be updated in a future release.
 
 ## Getting Started
 
