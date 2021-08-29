@@ -139,13 +139,15 @@ class Launchpad_wrapper:
         if(state==True):
             self.states[num] = True
 
-            self.OSC.transmitOSC(self.padnum, num)
+            self.OSC.transmitOSC(self.padnum, num, state=1)
             
             if(self.buttons[num]!='off'):
                 logging.debug("Launchpad id:{}, col set button press, brightening {}".format(self.padnum, num))
                 self.setCol(num, self.buttons[num].replace('light_', ''))
         elif(state==False):
             self.states[num] = False
+            self.OSC.transmitOSC(self.padnum, num, state=0)
+
         else:
             time.sleep(0.001)
             if(self.states[110] and self.states[111] and self.states[89] and self.states[19]):

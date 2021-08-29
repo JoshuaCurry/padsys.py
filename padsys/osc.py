@@ -13,7 +13,7 @@ class OSC_send:
         self.exec_page_mode = EXEC_PAGE_MODE
         self.number_of_pads = NUMBER_OF_PADS
 
-    def transmitOSC(self, padnum, but):
+    def transmitOSC(self, padnum, but, state=1):
         #TODO update this button decoder using the padnumber
 
         execpage = self.execpage_from_mode(padnum)
@@ -22,7 +22,7 @@ class OSC_send:
         oscstring = '/exec/'+str(execpage)+'/'+str(executor)
         oscbytes = oscstring.encode('utf-8')
         logging.debug("Launchpad id:{}, transmitOSC {}".format(padnum, oscstring))
-        self.osc.send_message(oscbytes, [])
+        self.osc.send_message(oscbytes, [state])
 
     def send_message(self, dest, msg):
         # logging.debug("send_message {} [{}]".format(dest, msg))
